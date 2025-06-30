@@ -1,0 +1,104 @@
+<!-- El contenido del archivo completo anterior con inventario y filtros se mantiene igual hasta la sección de fiados. Agregaremos los filtros para fiados a continuación. -->
+
+<div class="container section">
+  <h2>💸 Créditos y Fiados</h2>
+  <form id="fiado-form">
+    <div class="mb-3">
+      <label for="cliente" class="form-label">Nombre del cliente</label>
+      <input type="text" class="form-control" id="cliente" required />
+    </div>
+    <div class="mb-3">
+      <label for="producto-fiado" class="form-label">Producto</label>
+      <input type="text" class="form-control" id="producto-fiado" required />
+    </div>
+    <div class="mb-3">
+      <label for="fecha-fiado" class="form-label">Fecha</label>
+      <input type="date" class="form-control" id="fecha-fiado" required />
+    </div>
+    <div class="mb-3">
+      <label for="total-fiado" class="form-label">Total</label>
+      <input type="number" class="form-control" id="total-fiado" required />
+    </div>
+    <div class="mb-3">
+      <label for="abono" class="form-label">Abono</label>
+      <input type="number" class="form-control" id="abono" />
+    </div>
+    <button type="submit" class="btn btn-pink" style="background-color:#dda0dd;">Registrar fiado</button>
+  </form>
+
+  <div class="mt-4">
+    <h5>🔍 Filtros de fiados</h5>
+    <input type="text" id="filtro-cliente" class="form-control mb-2" placeholder="Filtrar por cliente...">
+    <input type="text" id="filtro-producto-fiado" class="form-control mb-2" placeholder="Filtrar por producto...">
+    <input type="date" id="filtro-fecha-fiado" class="form-control mb-2">
+  </div>
+
+  <div class="table-section">
+    <h4>Lista de fiados</h4>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Producto</th>
+          <th>Fecha</th>
+          <th>Total</th>
+          <th>Abono</th>
+          <th>Saldo</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-fiados"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  document.getElementById('fiado-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const cliente = document.getElementById('cliente').value;
+    const producto = document.getElementById('producto-fiado').value;
+    const fecha = document.getElementById('fecha-fiado').value;
+    const total = parseFloat(document.getElementById('total-fiado').value);
+    const abono = parseFloat(document.getElementById('abono').value) || 0;
+
+    const item = { cliente, producto, fecha, total, abono };
+    let fiados = JSON.parse(localStorage.getItem('fiados')) || [];
+    fiados.push(item);
+    localStorage.setItem('fiados', JSON.stringify(fiados));
+
+    mostrarFiados();
+    this.reset();
+  });
+
+  document.getElementById('filtro-cliente').addEventListener('input', mostrarFiados);
+  document.getElementById('filtro-producto-fiado').addEventListener('input', mostrarFiados);
+  document.getElementById('filtro-fecha-fiado').addEventListener('input', mostrarFiados);
+
+  function mostrarFiados() {
+    const fiados = JSON.parse(localStorage.getItem('fiados')) || [];
+    const tabla = document.getElementById('tabla-fiados');
+
+    const filtroCliente = document.getElementById('filtro-cliente').value.toLowerCase();
+    const filtroProducto = document.getElementById('filtro-producto-fiado').value.toLowerCase();
+    const filtroFecha = document.getElementById('filtro-fecha-fiado').value;
+
+    const filtrado = fiados.filter(f => {
+      return (
+        (!filtroCliente || f.cliente.toLowerCase().includes(filtroCliente)) &&
+        (!filtroProducto || f.producto.toLowerCase().includes(filtroProducto)) &&
+        (!filtroFecha || f.fecha === filtroFecha)
+      );
+    });
+
+    tabla.innerHTML = filtrado.map(f => `
+      <tr>
+        <td>${f.cliente}</td>
+        <td>${f.producto}</td>
+        <td>${f.fecha}</td>
+        <td>$${f.total.toFixed(2)}</td>
+        <td>$${f.abono.toFixed(2)}</td>
+        <td>$${(f.total - f.abono).toFixed(2)}</td>
+      </tr>`).join('');
+  }
+
+  mostrarFiados();
+</script>
