@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control Rosa</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <style>
+    body {
+      background: #fff0f5;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .navbar {
+      background-color: #f8c6d8;
+    }
+    .section {
+      padding: 2rem;
+    }
+    .icon {
+      font-size: 1.5rem;
+    }
+    .table-section {
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">💖 Control Rosa</a>
+    </div>
+  </nav>
+
+  <div class="container section">
+    <h2>📦 Inventario</h2>
+    <form id="inventario-form">
+      <div class="mb-3">
+        <label for="producto" class="form-label">Nombre del producto</label>
+        <input type="text" class="form-control" id="producto" required />
+      </div>
+      <div class="mb-3">
+        <label for="categoria" class="form-label">Categoría</label>
+        <select class="form-control" id="categoria">
+          <option value="Mujer">Mujer</option>
+          <option value="Hombre">Hombre</option>
+          <option value="Niño">Niño</option>
+          <option value="Niña">Niña</option>
+          <option value="Joyería">Joyería</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="cantidad" class="form-label">Cantidad</label>
+        <input type="number" class="form-control" id="cantidad" required />
+      </div>
+      <div class="mb-3">
+        <label for="precio" class="form-label">Precio</label>
+        <input type="number" class="form-control" id="precio" required />
+      </div>
+      <button type="submit" class="btn btn-pink" style="background-color:#ffb6c1;">Agregar producto</button>
+    </form>
+
+    <div class="mt-4">
+      <h5>🔍 Filtros</h5>
+      <input type="text" id="filtro-nombre" class="form-control mb-2" placeholder="Filtrar por nombre...">
+      <select id="filtro-categoria" class="form-control">
+        <option value="">Todas las categorías</option>
+        <option value="Mujer">Mujer</option>
+        <option value="Hombre">Hombre</option>
+        <option value="Niño">Niño</option>
+        <option value="Niña">Niña</option>
+        <option value="Joyería">Joyería</option>
+      </select>
+    </div>
+
+    <div class="table-section">
+      <h4>Lista de productos</h4>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-inventario"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="container section">
+    <h2>💸 Créditos y Fiados</h2>
+    <form id="fiado-form">
+      <div class="mb-3">
+        <label for="cliente" class="form-label">Nombre del cliente</label>
+        <input type="text" class="form-control" id="cliente" required />
+      </div>
+      <div class="mb-3">
+        <label for="producto-fiado" class="form-label">Producto</label>
+        <input type="text" class="form-control" id="producto-fiado" required />
+      </div>
+      <div class="mb-3">
+        <label for="fecha-fiado" class="form-label">Fecha</label>
+        <input type="date" class="form-control" id="fecha-fiado" required />
+      </div>
+      <div class="mb-3">
+        <label for="total-fiado" class="form-label">Total</label>
+        <input type="number" class="form-control" id="total-fiado" required />
+      </div>
+      <div class="mb-3">
+        <label for="abono" class="form-label">Abono</label>
+        <input type="number" class="form-control" id="abono" />
+      </div>
+      <button type="submit" class="btn btn-pink" style="background-color:#dda0dd;">Registrar fiado</button>
+    </form>
+  </div>
+
+  <div class="container section">
+    <h2>📅 Agenda y Calendario</h2>
+    <form id="agenda-form">
+      <div class="mb-3">
+        <label for="evento" class="form-label">Título del evento</label>
+        <input type="text" class="form-control" id="evento" required />
+      </div>
+      <div class="mb-3">
+        <label for="fecha-evento" class="form-label">Fecha</label>
+        <input type="date" class="form-control" id="fecha-evento" required />
+      </div>
+      <div class="mb-3">
+        <label for="hora-evento" class="form-label">Hora</label>
+        <input type="time" class="form-control" id="hora-evento" required />
+      </div>
+      <div class="mb-3">
+        <label for="descripcion-evento" class="form-label">Descripción</label>
+        <textarea class="form-control" id="descripcion-evento"></textarea>
+      </div>
+      <button type="submit" class="btn btn-pink" style="background-color:#add8e6;">Agregar evento</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('inventario-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const producto = document.getElementById('producto').value;
+      const categoria = document.getElementById('categoria').value;
+      const cantidad = parseInt(document.getElementById('cantidad').value);
+      const precio = parseFloat(document.getElementById('precio').value);
+
+      const item = { producto, categoria, cantidad, precio, total: cantidad * precio };
+      let inventario = JSON.parse(localStorage.getItem('inventario')) || [];
+      inventario.push(item);
+      localStorage.setItem('inventario', JSON.stringify(inventario));
+
+      mostrarInventario();
+      this.reset();
+    });
+
+    document.getElementById('filtro-nombre').addEventListener('input', mostrarInventario);
+    document.getElementById('filtro-categoria').addEventListener('change', mostrarInventario);
+
+    function mostrarInventario() {
+      const inventario = JSON.parse(localStorage.getItem('inventario')) || [];
+      const tabla = document.getElementById('tabla-inventario');
+      const filtroNombre = document.getElementById('filtro-nombre').value.toLowerCase();
+      const filtroCategoria = document.getElementById('filtro-categoria').value;
+
+      const filtrado = inventario.filter(p => {
+        return (
+          (!filtroNombre || p.producto.toLowerCase().includes(filtroNombre)) &&
+          (!filtroCategoria || p.categoria === filtroCategoria)
+        );
+      });
+
+      tabla.innerHTML = filtrado.map(p => `
+        <tr>
+          <td>${p.producto}</td>
+          <td>${p.categoria}</td>
+          <td>${p.cantidad}</td>
+          <td>$${p.precio.toFixed(2)}</td>
+          <td>$${p.total.toFixed(2)}</td>
+        </tr>`).join('');
+    }
+
+    mostrarInventario();
+  </script>
+</body>
+</html>
